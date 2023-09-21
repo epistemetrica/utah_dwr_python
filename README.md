@@ -1,0 +1,3 @@
+## Libraries
+
+Camelot dependencies: ghostscript 

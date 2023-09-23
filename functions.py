@@ -1,3 +1,5 @@
+import re
+
 def panda_stripper(df):
     '''Strips all string columns in a pandas dataframe, in place. Seems like this should already be a pd method, but whatever.'''
     df_obj = df.select_dtypes(['object'])

@@ -7,10 +7,10 @@ This project also serves as the Capstone for the Udacity Data Scientist Nanodegr
 ## Project Definition
 
 This project has the following parts:
-1. ETL pipelines for each type of animal which processes data from blood test lab results. The pipelines have two outputs:
+1. An ETL pipeline (wildlife_ETL.py) which processes data from lab results. The pipelines have two outputs:
     - A set of excel files matching the format used by the Utah DWR vet office. 
     - A SQLite database for further analysis within this project. 
-2. A Jupyter notebook (INSERT FILE NAME) analysing the data to gain insights, and consists of the following sections:
+2. A Jupyter notebook (wildlife_disease.ipynb) analysing the data to gain insights, and consists of the following sections:
     - Problem statement
     - Data prepration
     - Analysis

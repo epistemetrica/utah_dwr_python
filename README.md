@@ -12,8 +12,8 @@ This project has the following parts:
     - A SQLite database for further analysis within this project. 
 2. A Jupyter notebook (INSERT FILE NAME) analysing the data to gain insights, and consists of the following sections:
     - Problem statement
+    - Data prepration
     - Analysis
-    - Methodology
     - Results
     - Conclusion
 3. A Medium blog post written for a technical audience. 

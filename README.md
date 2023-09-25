@@ -31,7 +31,9 @@ The data come to me in two parts:
 1. Excel sheets provided by the DWR Vet Office showing animal id, species, capture dates, and locations. 
 2. PDFs from various labs showing the results of various disease tests performed on each animal. Tables were extracted from these PDFs into excel documents using [Tabula](https://tabula.technology/)'s desktop app. (A more talented data scientist perhaps could have figued out a way to do this using the tabula-py library, but I could not.)
 
-The data is available to Udacity reviewers and mentors on request, but will not be made public due to the extremely high cost of gathering the data. 
+*NOTE: The data is available to Udacity reviewers and mentors on request, but will not be made public due to the extremely high cost of gathering the data.*
+
+Please see the definitions.md file in the main project directory for the specifics of each variable.
 
 ## File Descriptions
 

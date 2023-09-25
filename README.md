@@ -16,7 +16,7 @@ This project has the following parts:
     - Analysis
     - Results
     - Conclusion
-3. A Medium blog post written for a technical audience. 
+3. A [Medium blog post](___________) written for a technical audience. 
 4. The corresponding [github repo](https://github.com/epistemetrica/utah_dwr_python). 
 
 ## Motivation

@@ -205,18 +205,7 @@ def elk_etl():
     #merge into main table
     elk_table = elk_table.merge(ehdv_df, on='sample_id', how='outer')
 
-    #read and trip BVD table
-    bvd_df = pd.read_excel('data/elk_tables.xlsx', sheet_name='bv_diarrhea')
-    bvd_df = panda_stripper(bvd_df)
-    #get sample ids
-    bvd_df['sample_id'] = bvd_df['label'].apply(lambda row: re.split(r"\s|/", row)[1])
-    #drop label col
-    del bvd_df['label']
-    #rename cols
-    bvd_df.columns = ['bvd_result', 'sample_id']
-    #merge with main table
-    elk_table = elk_table.merge(bvd_df, on='sample_id', how='outer')
-    #read and trip table
+    #read and strip BVD table
     bvd_df = pd.read_excel('data/elk_tables.xlsx', sheet_name='bv_diarrhea')
     bvd_df = panda_stripper(bvd_df)
     #get sample ids

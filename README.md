@@ -7,8 +7,8 @@ This project also serves as the Capstone for the Udacity Data Scientist Nanodegr
 ## Project Definition
 
 This project has the following parts:
-1. An ETL pipeline (INSERT FILE NAME) which processes data from blood test lab results. The pipeline has two outputs:
-    - A set of species-specific excel files matching the format used by the Utah DWR vet office. 
+1. ETL pipelines for each type of animal which processes data from blood test lab results. The pipelines have two outputs:
+    - A set of excel files matching the format used by the Utah DWR vet office. 
     - A SQLite database for further analysis within this project. 
 2. A Jupyter notebook (INSERT FILE NAME) analysing the data to gain insights, and consists of the following sections:
     - Problem statement
@@ -32,6 +32,8 @@ The data come to me in two parts:
 2. PDFs from various labs showing the results of various disease tests performed on each animal. Tables were extracted from these PDFs into excel documents using [Tabula](https://tabula.technology/)'s desktop app. (A more talented data scientist perhaps could have figued out a way to do this using the tabula-py library, but I could not.)
 
 The data is available to Udacity reviewers and mentors on request, but will not be made public due to the extremely high cost of gathering the data. 
+
+## File Descriptions
 
 ## Libraries 
 

@@ -225,7 +225,7 @@ def elk_etl():
     #drop unneeded col
     del preggers_df['animal_id']
     #rename cols
-    preggers_df.columns = ['preg_OD_val', 'preg_result', 'sample_id']
+    preggers_df.columns = ['preg_val', 'preg_result', 'sample_id']
     #merge into main table
     elk_table = elk_table.merge(preggers_df, on='sample_id', how='outer')
 
@@ -260,7 +260,7 @@ def moose_etl():
     preg_df = pd.read_excel('data/moose_tables.xlsx', sheet_name='pregnant', usecols=[1,2,3])
     preg_df = panda_stripper(preg_df)
     #rename cols
-    preg_df.columns = ['sample_id', 'preg_OD_val', 'preg_result']
+    preg_df.columns = ['sample_id', 'preg_val', 'preg_result']
     #merge with main table
     moose_table = moose_table.merge(preg_df, on='sample_id', how='outer')
 

@@ -13,9 +13,19 @@
 - staging_area - the staging area for capture efforts (not used)
 - adenovirus_result - Positive/Negative result for adenovirus
 - bluetongue_result - Positive/Negative result of Bluetongue Disease test
+- bvd_result - Positive/Negative Bovine viral diarrhea test result
 - bvd_type1_result - Positive/Negative Bovine viral diarrhea test result type 1
 - bvd_type2_result - Positive/Negative Bovine viral diarrhea test result type 2
 - ehdv_result - Positive/Negative result of Epizootic Hemorrhagic Disease Virus test
+    - ehdv_typeX_result/val - values and results for various types of ehdv tests
+- lentivirus_val - the specific values of the test for lentivirus
+- lentivirus_result - Positive/Negative results of lentivirus test
+- movi_elisa_val - the specific values of the ELISA test for *mycoplasma ovipneumoniae* bacteria
+- movi_elisa_result - Positive/Negative result of the ELISA test for *mycoplasma ovipneumoniae* bacteria
+    - Note: ELISA tests indicate the presence of immune factors indicating whether or not the animal has had the disease in the past. 
+- movi_PCR_result - Positive/Negative result of the PCR test for *mycoplasma ovipneumoniae* bacteria
+    - PCR test indicate whether or not the animal is currently shedding the bacteria. I.e., it measures whether or not the animal currently has the bateria in its system and is contagious. 
 - preg_val - exact value of pregnancy test 
 - preg_result - Positive/Negative pregnancy result
-- 
+- tonsular_culture_result - indicates whether or not bacteria grew from the tonsular sample
+- tonsular_culture_isolate - indicates the type of bacteria that grew from the sample

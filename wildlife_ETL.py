@@ -259,10 +259,176 @@ def elk_etl():
     elk_table.to_sql('elk_table', engine, index=False, if_exists='replace')
 
 
+#define moose etl
+def moose_etl():
+    #read main excel table and strip
+    moose_table = pd.read_excel('data/Moose_2021_22_Sample sheet.xlsx', skiprows=range(6,11))
+    moose_table = panda_stripper(moose_table)
+    #rename cols
+    moose_table.columns = ['sample_id', 'collar_id', 'species', 'sex', 'capture_date', 'capture_unit', 'staging_area']
+
+    #read and stip pregnancy table
+    preg_df = pd.read_excel('data/moose_tables.xlsx', sheet_name='pregnant', usecols=[1,2,3])
+    preg_df = panda_stripper(preg_df)
+    #rename cols
+    preg_df.columns = ['sample_id', 'preg_OD_val', 'preg_result']
+    #merge with main table
+    moose_table = moose_table.merge(preg_df, on='sample_id', how='outer')
+
+    #read and strip bluetongue table
+    bluetongue_df = pd.read_excel('data/moose_tables.xlsx', sheet_name='bluetongue') 
+    bluetongue_df = panda_stripper(bluetongue_df)
+    #get sample ids and drop original col
+    bluetongue_df = get_sample_id(bluetongue_df, 'Specimen')
+    del bluetongue_df['Specimen']
+    #rename cols 
+    bluetongue_df.columns = ['bluetongue_result', 'sample_id']
+    #merge with main table
+    moose_table = moose_table.merge(bluetongue_df, on='sample_id', how='outer')
+
+    #export to excel for office use
+    moose_table.to_excel('data/finals/Moose 2021-2022 Lab Results.xlsx', index=False)
+
+    #load to db
+    moose_table.to_sql('moose_table', engine, index=False, if_exists='replace')
+
+
+#define pronghorn elt
+def pronghorn_etl():
+    #read and strip main table
+    pronghorn_table = pd.read_excel('data/Pronghorn_2021_22_Sample sheet.xlsx', usecols=range(0,8))
+    pronghorn_table = panda_stripper(pronghorn_table)
+    #rename cols
+    pronghorn_table.columns = ['sample_id', 'archive_id', 'collar_id', 'species', 'sex', 'capture_date', 'capture_unit', 'staging_area']
+
+    #read and strip bluetonge table
+    bt_df = pd.read_excel('data/pronghorn_tables.xlsx', sheet_name='bluetongue')
+    bt_df = panda_stripper(bt_df)
+    #get sample ids
+    bt_df.specimen = bt_df.specimen.apply(lambda row: re.split(r"\s|/", row)[0])
+    #rename cols
+    bt_df.columns = ['sample_id', 'bluetongue_result']
+    #merge with main table
+    pronghorn_table = pronghorn_table.merge(bt_df, on='sample_id', how='outer')
+
+    ## NOTE pronghorn fecal results pending more info from vet office
+
+    #extract to excel for office use
+    pronghorn_table.to_excel('data/finals/Pronghorn 2021-2022 Lab Results.xlsx', index=False)
+
+    #load to db
+    pronghorn_table.to_sql('pronghorn_table', engine, index=False, if_exists='replace')
+
+
+#define bighorn sheet and mountain goat etl
+def sheep_goat_etl():
+    #load bighorn sheep data
+    sheep_table = pd.read_excel('data/Bighorn sheep_2021_22_Sample sheet.xlsx')
+    sheep_table = panda_stripper(sheep_table)
+    #rename columns
+    sheep_table.columns = ['sample_id', 'collar_id', 'species', 'sex', 'capture_date', 'capture_unit', 'staging_area', 'comments']
+    #load and strip goat table
+    goat_table = pd.read_excel('data/Mt. Goat_2021_22_Sample sheet.xlsx')
+    goat_table = panda_stripper(goat_table)
+    #rename cols
+    goat_table.columns = ['sample_id', 'collar_id', 'species', 'sex', 'capture_date', 'capture_unit', 'comments']
+    #concat tables
+    sheep_goat_table = pd.concat([sheep_table, goat_table])
+
+    #read and strip m. ovi ELISA table
+    movi_elisa_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='movi_elisa', usecols=[1,2,3])
+    movi_elisa_df = panda_stripper(movi_elisa_df) 
+    #get sample_id and drop original col
+    movi_elisa_df = get_sample_id(movi_elisa_df, 'Animal')
+    del movi_elisa_df['Animal']
+    #rename cols
+    movi_elisa_df.columns = ['movi_elisa_val', 'movi_elisa_result', 'sample_id']
+    #merge with sheep goat table
+    sheep_goat_table = sheep_goat_table.merge(movi_elisa_df, on= 'sample_id', how='outer')
+
+    #read and strip m. ovi PCR tables
+    movi_pcr_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='movi_pcr', usecols=[0,2])
+    movi_pcr_df = panda_stripper(movi_pcr_df)
+    #get sample ids and drop original col
+    movi_pcr_df = get_sample_id(movi_pcr_df, 'Animal')
+    del movi_pcr_df['Animal']
+    #rename cols
+    movi_pcr_df.columns = ['movi_pcr_result', 'sample_id']
+    #merge with sheep goat table
+    sheep_goat_table = sheep_goat_table.merge(movi_pcr_df, on= 'sample_id', how='outer')
+
+    #read and strip lentivirus tables
+    lentivirus_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='lentivirus', usecols=[1,2,3])
+    lentivirus_df = panda_stripper(lentivirus_df)
+    #get sample id and drop original col
+    lentivirus_df = get_sample_id(lentivirus_df, 'Animal')
+    del lentivirus_df['Animal']
+    #rename cols
+    lentivirus_df.columns = ['lentivirus_val', 'lentivirus_result', 'sample_id']
+    #merge with sheep goat table
+    sheep_goat_table = sheep_goat_table.merge(lentivirus_df, on='sample_id', how='outer')
+
+    #read and strip EHDV tables
+    ehdv_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='ehdv', usecols=[1,2,3])
+    ehdv_df = panda_stripper(ehdv_df)
+    #get sample id and drop original col
+    ehdv_df = get_sample_id(ehdv_df, 'Animal')
+    del ehdv_df['Animal']
+    #rename cols
+    ehdv_df.columns = ['ehdv_val', 'ehdv_result', 'sample_id']
+    #merge with sheep goat table
+    sheep_goat_table = sheep_goat_table.merge(ehdv_df, on='sample_id', how='outer')
+
+    #read and strip bluetongue table
+    bluetongue_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='bluetongue', usecols=[1,2])
+    bluetongue_df = panda_stripper(bluetongue_df)
+    #get sample ids and delete original col
+    bluetongue_df = get_sample_id(bluetongue_df, 'Animal')
+    del bluetongue_df['Animal']
+    #rename cols
+    bluetongue_df.columns = ['bluetongue_result', 'sample_id']
+    #clean results col
+    bluetongue_df.bluetongue_result = bluetongue_df.bluetongue_result.apply(lambda row: 'Negative' if row.startswith('Neg') else 'Positive')
+    #merge with sheep goats table
+    sheep_goat_table = sheep_goat_table.merge(bluetongue_df, on='sample_id', how='outer')
+
+    #read and strip leukotokin lktA tables
+    lktA_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='lktA_pcr', usecols=[0,2])
+    lktA_df = panda_stripper(lktA_df)
+    #get sample ids and drop original col
+    lktA_df = get_sample_id(lktA_df, 'Animal')
+    del lktA_df['Animal']
+    #rename cols
+    lktA_df.columns = ['leukotoxin_lktA_result', 'sample_id']
+    #merge with sheep goats
+    sheep_goat_table = sheep_goat_table.merge(lktA_df, on='sample_id', how='outer')
+
+    #read and strip tonsular swab results tables
+    bact_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='sop_bact_2', usecols=[0,2,3])
+    bact_df = panda_stripper(bact_df)
+    #get sample id and drop original col
+    bact_df = get_sample_id(bact_df, 'Animal')
+    del bact_df['Animal']
+    #rename cols
+    bact_df.columns = ['tonsular_culture_result', 'tonsular_culture_isolate', 'sample_id']
+    #merge with sheet goats table
+    sheep_goat_table = sheep_goat_table.merge(bact_df, on='sample_id', how='outer')
+
+    #export to excel for office use
+    sheep_goat_table.to_excel('data/finals/Big Horn and Mtn Goats 2021-2022 Lab Results.xlsx', index=False)
+
+    #load to db
+    sheep_goat_table.to_sql('sheep_goat_table', engine, index=False, if_exists='replace')
+
+
 def main():
     engine = create_engine('sqlite:///data/wildlife.db')
     bison_etl()
     deer_etl()
+    elk_etl()
+    moose_etl()
+    pronghorn_etl()
+    sheep_goat_etl()
 
 
 if __name__ == '__main__':

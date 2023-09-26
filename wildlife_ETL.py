@@ -113,10 +113,10 @@ def bison_etl():
 #etl deer
 def deer_etl():
     #read excel table and strip
-    deer_table = pd.read_excel('data/Muledeer_2021_22_Sample sheet.xlsx', usecols=[0,1,2,3,4,5])
+    deer_table = pd.read_excel('data/Muledeer_2021_22_comp_sample sheet.xlsx')
     deer_table = panda_stripper(deer_table)
     #rename columns
-    deer_table.columns = ['sample_id', 'collar_id', 'species', 'sex', 'capture_date', 'capture_unit']
+    deer_table.columns = ['sample_id', 'collar_id', 'species', 'sex', 'capture_date', 'capture_unit', 'staging_area', 'weight', 'age', 'capture_lat', 'capture_long', 'body_condition', 'lactation', 'comments']
 
     #read and strip adenovirus table
     adenovirus_df = pd.read_excel('data/deer_tables.xlsx', sheet_name='adenovirus')

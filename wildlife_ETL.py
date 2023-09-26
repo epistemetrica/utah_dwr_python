@@ -305,7 +305,11 @@ def pronghorn_etl():
     #merge with main table
     pronghorn_table = wildlife_merge(pronghorn_table, bt_df)
 
-    ## NOTE pronghorn fecal results pending more info from vet office
+    #read and strip fecal results
+    fecal_df = pd.read_excel('data/pronghorn_tables.xlsx', sheet_name='fecal')
+    fecal_df = panda_stripper(fecal_df)
+    #merge with main table
+    pronghorn_table = wildlife_merge(pronghorn_table, fecal_df)
 
     #extract to excel for office use
     pronghorn_table.to_excel('data/finals/Pronghorn 2021-2022 Lab Results.xlsx', index=False)

@@ -16,6 +16,9 @@
 - bvd_result - Positive/Negative Bovine viral diarrhea test result
 - bvd_type1_result - Positive/Negative Bovine viral diarrhea test result type 1
 - bvd_type2_result - Positive/Negative Bovine viral diarrhea test result type 2
+- eimeria_OPG - Value (oocytes per gram) of Eimeria paracite present in fecal samples
+- strongyles_EPG - Value (eggs per gram) of Strongyles paracite present in fecal sample
+- nemotodirus_EPG - Value (eggs per gram) of Nemotodirus pracite present in fecal sample
 - ehdv_result - Positive/Negative result of Epizootic Hemorrhagic Disease Virus test
     - ehdv_typeX_result/val - values and results for various types of ehdv tests
 - lentivirus_val - the specific values of the test for lentivirus

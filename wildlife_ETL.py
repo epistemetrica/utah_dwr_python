@@ -127,8 +127,10 @@ def deer_etl():
     adenovirus_df['adenovirus_result'] = adenovirus_df.apply(lambda row: row['result1'] if row['result1'] is not np.NaN else row['result2'], axis=1)
     del adenovirus_df['result1']
     del adenovirus_df['result2']
-    #trim "Negative @" result
-    adenovirus_df['adenovirus_result'] = adenovirus_df['adenovirus_result'].apply(lambda row: row.split()[0])
+    #rename result to val
+    adenovirus_df['adenovirus_val'] = adenovirus_df['adenovirus_result']
+    #set results to positive or negative (<=1:4 is Negative, higher is positive)
+    adenovirus_df['adenovirus_result'] = adenovirus_df['adenovirus_result'].apply(lambda row: 'Negative' if row in ['1:4', '<1:4', 'Negative @ 1:4'] else 'Positive')
     #merge with deer_table
     deer_table = wildlife_merge(deer_table, adenovirus_df)
 

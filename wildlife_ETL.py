@@ -25,6 +25,11 @@ def get_sample_id(df, column):
     df['sample_id'] = df[column].apply(lambda row: re.split(r"\s|,", row)[0])
     return df
 
+def wildlife_merge(df1, df2):
+    '''pandas merge with preferred settings'''
+    df = df1.merge(df2.drop_duplicates(subset='sample_id'), on='sample_id', how='outer')
+    return df
+
 #create SQLlite db 
 engine = create_engine('sqlite:///data/wildlife.db')
 
@@ -52,7 +57,7 @@ def bison_etl():
     #trim results
     bvd_type1_df.bvd_type1_result = bvd_type1_df.bvd_type1_result.apply(lambda row: row.split()[0])
     #merge into main table
-    bison_table = bison_table.merge(bvd_type1_df, on= 'sample_id', how='outer')
+    bison_table = wildlife_merge(bison_table, bvd_type1_df)
 
     #load bvd type 2 tests and strip strings
     bvd_type2_df = pd.read_excel('data/bison_tables.xlsx', sheet_name='bv_diarrhea_type2', usecols= [0,2])
@@ -68,7 +73,7 @@ def bison_etl():
     #trim results
     bvd_type2_df.bvd_type2_result = bvd_type2_df.bvd_type2_result.apply(lambda row: row.split()[0])
     #merge into main table
-    bison_table = bison_table.merge(bvd_type2_df, on= 'sample_id', how='outer')
+    bison_table = wildlife_merge(bison_table, bvd_type2_df)
 
     #load EHDV data and strip
     ehdv_df = pd.read_excel('data/bison_tables.xlsx', sheet_name='ehdv', usecols=[0,2])
@@ -84,10 +89,10 @@ def bison_etl():
     #rename columns
     ehdv_df.columns = ['sample_id', 'ehdv_result']
     #merge into bison_table
-    bison_table = bison_table.merge(ehdv_df, on= 'sample_id', how='outer')
+    bison_table = wildlife_merge(bison_table, ehdv_df)
 
     #load and strip bluetongue data
-    bluepreg_df = pd.read_excel('data/bison_tables.xlsx', sheet_name='bluetongue')
+    bluepreg_df = pd.read_excel('data/bison_tables.xlsx', sheet_name='bluetongue') # the lab reported bluetongue and pregnancy results together
     bluepreg_df = panda_stripper(bluepreg_df)
     #name columns
     bluepreg_df.columns = ['animal', 'preg_val', 'preg_result', 'bluetongue_result']
@@ -96,7 +101,7 @@ def bison_etl():
     #drop animal col
     del bluepreg_df['animal']
     #merge into bison_table
-    bison_table = bison_table.merge(bluepreg_df, on= 'sample_id', how='outer')
+    bison_table = wildlife_merge(bison_table, bluepreg_df)
 
     #export to .xlsx format for vet office
     bison_table.to_excel('data/finals/Bison 2021-2022 Lab Results.xlsx', index=False)
@@ -125,7 +130,7 @@ def deer_etl():
     #trim "Negative @" result
     adenovirus_df['adenovirus_result'] = adenovirus_df['adenovirus_result'].apply(lambda row: row.split()[0])
     #merge with deer_table
-    deer_table = deer_table.merge(adenovirus_df, on='sample_id', how='outer')
+    deer_table = wildlife_merge(deer_table, adenovirus_df)
 
     #read and strip EHDV table
     ehdv_df = pd.read_excel('data/deer_tables.xlsx', sheet_name='ehdv', usecols=[0,2])
@@ -136,7 +141,7 @@ def deer_etl():
     #rename cols
     ehdv_df.columns = ['ehdv_result', 'sample_id']
     #merge with deer_table
-    deer_table = deer_table.merge(ehdv_df, on='sample_id', how='outer')
+    deer_table = wildlife_merge(deer_table, ehdv_df)
 
     #read and strip bluetonge table
     bluetongue_df = pd.read_excel('data/deer_tables.xlsx', sheet_name='bluetongue')
@@ -147,7 +152,7 @@ def deer_etl():
     #rename cols
     bluetongue_df.columns = ['bluetongue_result', 'sample_id']
     #merge with deer_table
-    deer_table = deer_table.merge(bluetongue_df, on='sample_id', how='outer')
+    deer_table = wildlife_merge(deer_table, bluetongue_df)
 
     #export to xlsx for office use
     deer_table.to_excel('data/finals/Mule Deer 2021-2022 Lab Results.xlsx', index=False)
@@ -179,7 +184,7 @@ def elk_etl():
     #reset index
     df = df.reset_index(drop=True)
     df.columns = ['result']
-    #merge
+    #concat
     ehdv_df = pd.concat([ehdv_df, df], axis=1)
     #get sample ids
     ehdv_df['sample_id'] = ehdv_df['animal'].apply(lambda row: re.split(r"\s|/", row)[2][:7])
@@ -200,10 +205,10 @@ def elk_etl():
     del ehdv2_df['test']
     del ehdv6_df['test']
     #merge the 3 dfs into single tidy ehdv df
-    ehdv_df = ehdv1_df.merge(ehdv2_df, on='sample_id', how='outer')
-    ehdv_df = ehdv_df.merge(ehdv6_df, on='sample_id', how='outer')
+    ehdv_df = wildlife_merge(ehdv1_df, ehdv2_df)
+    ehdv_df = wildlife_merge(ehdv_df, ehdv6_df)
     #merge into main table
-    elk_table = elk_table.merge(ehdv_df, on='sample_id', how='outer')
+    elk_table = wildlife_merge(elk_table, ehdv_df)
 
     #read and strip BVD table
     bvd_df = pd.read_excel('data/elk_tables.xlsx', sheet_name='bv_diarrhea')
@@ -215,7 +220,7 @@ def elk_etl():
     #rename cols
     bvd_df.columns = ['bvd_result', 'sample_id']
     #merge with main table
-    elk_table = elk_table.merge(bvd_df, on='sample_id', how='outer')
+    elk_table = wildlife_merge(elk_table, bvd_df)
 
     #read and strip pregnancy results table
     preggers_df = pd.read_excel('data/elk_tables.xlsx', sheet_name='preg', usecols=[1,2,3])
@@ -227,7 +232,7 @@ def elk_etl():
     #rename cols
     preggers_df.columns = ['preg_val', 'preg_result', 'sample_id']
     #merge into main table
-    elk_table = elk_table.merge(preggers_df, on='sample_id', how='outer')
+    elk_table = wildlife_merge(elk_table, preggers_df)
 
     #read and strip bluetongue table
     bt_df = pd.read_excel('data/elk_tables.xlsx', sheet_name='bluetongue')
@@ -239,7 +244,7 @@ def elk_etl():
     #rename
     bt_df.columns = ['bluetongue_result', 'sample_id']
     #merge with main table
-    elk_table = elk_table.merge(bt_df, on='sample_id', how='outer')
+    elk_table = wildlife_merge(elk_table, bt_df)
 
     #export to excel for office use:
     elk_table.to_excel('data/finals/Elk 2021-2022 Lab Results.xlsx', index=False)
@@ -262,7 +267,7 @@ def moose_etl():
     #rename cols
     preg_df.columns = ['sample_id', 'preg_val', 'preg_result']
     #merge with main table
-    moose_table = moose_table.merge(preg_df, on='sample_id', how='outer')
+    moose_table = wildlife_merge(moose_table, preg_df)
 
     #read and strip bluetongue table
     bluetongue_df = pd.read_excel('data/moose_tables.xlsx', sheet_name='bluetongue') 
@@ -273,7 +278,7 @@ def moose_etl():
     #rename cols 
     bluetongue_df.columns = ['bluetongue_result', 'sample_id']
     #merge with main table
-    moose_table = moose_table.merge(bluetongue_df, on='sample_id', how='outer')
+    moose_table = wildlife_merge(moose_table, bluetongue_df)
 
     #export to excel for office use
     moose_table.to_excel('data/finals/Moose 2021-2022 Lab Results.xlsx', index=False)
@@ -298,7 +303,7 @@ def pronghorn_etl():
     #rename cols
     bt_df.columns = ['sample_id', 'bluetongue_result']
     #merge with main table
-    pronghorn_table = pronghorn_table.merge(bt_df, on='sample_id', how='outer')
+    pronghorn_table = wildlife_merge(pronghorn_table, bt_df)
 
     ## NOTE pronghorn fecal results pending more info from vet office
 
@@ -333,7 +338,7 @@ def sheep_goat_etl():
     #rename cols
     movi_elisa_df.columns = ['movi_elisa_val', 'movi_elisa_result', 'sample_id']
     #merge with sheep goat table
-    sheep_goat_table = sheep_goat_table.merge(movi_elisa_df, on= 'sample_id', how='outer')
+    sheep_goat_table = wildlife_merge(sheep_goat_table, movi_elisa_df)
 
     #read and strip m. ovi PCR tables
     movi_pcr_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='movi_pcr', usecols=[0,2])
@@ -344,7 +349,7 @@ def sheep_goat_etl():
     #rename cols
     movi_pcr_df.columns = ['movi_pcr_result', 'sample_id']
     #merge with sheep goat table
-    sheep_goat_table = sheep_goat_table.merge(movi_pcr_df, on= 'sample_id', how='outer')
+    sheep_goat_table = wildlife_merge(sheep_goat_table, movi_pcr_df)
 
     #read and strip lentivirus tables
     lentivirus_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='lentivirus', usecols=[1,2,3])
@@ -355,7 +360,7 @@ def sheep_goat_etl():
     #rename cols
     lentivirus_df.columns = ['lentivirus_val', 'lentivirus_result', 'sample_id']
     #merge with sheep goat table
-    sheep_goat_table = sheep_goat_table.merge(lentivirus_df, on='sample_id', how='outer')
+    sheep_goat_table = wildlife_merge(sheep_goat_table, lentivirus_df)
 
     #read and strip EHDV tables
     ehdv_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='ehdv', usecols=[1,2,3])
@@ -366,7 +371,7 @@ def sheep_goat_etl():
     #rename cols
     ehdv_df.columns = ['ehdv_val', 'ehdv_result', 'sample_id']
     #merge with sheep goat table
-    sheep_goat_table = sheep_goat_table.merge(ehdv_df, on='sample_id', how='outer')
+    sheep_goat_table = wildlife_merge(sheep_goat_table, ehdv_df)
 
     #read and strip bluetongue table
     bluetongue_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='bluetongue', usecols=[1,2])
@@ -379,7 +384,7 @@ def sheep_goat_etl():
     #clean results col
     bluetongue_df.bluetongue_result = bluetongue_df.bluetongue_result.apply(lambda row: 'Negative' if row.startswith('Neg') else 'Positive')
     #merge with sheep goats table
-    sheep_goat_table = sheep_goat_table.merge(bluetongue_df, on='sample_id', how='outer')
+    sheep_goat_table = wildlife_merge(sheep_goat_table, bluetongue_df)
 
     #read and strip leukotokin lktA tables
     lktA_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='lktA_pcr', usecols=[0,2])
@@ -390,7 +395,7 @@ def sheep_goat_etl():
     #rename cols
     lktA_df.columns = ['leukotoxin_lktA_result', 'sample_id']
     #merge with sheep goats
-    sheep_goat_table = sheep_goat_table.merge(lktA_df, on='sample_id', how='outer')
+    sheep_goat_table = wildlife_merge(sheep_goat_table, lktA_df)
 
     #read and strip tonsular swab results tables
     bact_df = pd.read_excel('data/sheep_goat_tables.xlsx', sheet_name='sop_bact_2', usecols=[0,2,3])
@@ -401,7 +406,7 @@ def sheep_goat_etl():
     #rename cols
     bact_df.columns = ['tonsular_culture_result', 'tonsular_culture_isolate', 'sample_id']
     #merge with sheet goats table
-    sheep_goat_table = sheep_goat_table.merge(bact_df, on='sample_id', how='outer')
+    sheep_goat_table = wildlife_merge(sheep_goat_table, bact_df)
 
     #export to excel for office use
     sheep_goat_table.to_excel('data/finals/Big Horn and Mtn Goats 2021-2022 Lab Results.xlsx', index=False)
